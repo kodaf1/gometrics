@@ -1,9 +1,14 @@
 package main
 
 import (
-	"github.com/kodaf1/gometrics/internal/errors"
+	"errors"
 	"github.com/kodaf1/gometrics/internal/urlparser"
 	"net/http"
+)
+
+// TODO: escape renaming
+import (
+	myErrors "github.com/kodaf1/gometrics/internal/errors"
 )
 
 func main() {
@@ -24,14 +29,18 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 
 	_, err := urlparser.Parse(r.URL.Path)
 
-	switch err {
-	case errors.IncorrectParamsCount:
+	switch {
+	case errors.Is(err, myErrors.IncorrectParamsCount):
 		w.WriteHeader(http.StatusNotFound)
 		return
-	case errors.UnknownType:
-	case errors.UnknownMethod:
+	case errors.Is(err, myErrors.UnknownMethod):
 		w.WriteHeader(http.StatusBadRequest)
 		return
+	case errors.Is(err, myErrors.UnknownType):
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	case errors.Is(err, nil):
+		break
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 		return
