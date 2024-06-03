@@ -18,7 +18,8 @@ func main() {
 }
 
 func run() error {
-	return http.ListenAndServe(`localhost:8080`, http.HandlerFunc(webhook))
+	http.Handle("/update/", http.HandlerFunc(webhook))
+	return http.ListenAndServe(`localhost:8080`, nil)
 }
 
 func webhook(w http.ResponseWriter, r *http.Request) {
@@ -32,9 +33,6 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.Is(err, myErrors.IncorrectParamsCount):
 		w.WriteHeader(http.StatusNotFound)
-		return
-	case errors.Is(err, myErrors.UnknownMethod):
-		w.WriteHeader(http.StatusBadRequest)
 		return
 	case errors.Is(err, myErrors.UnknownType):
 		w.WriteHeader(http.StatusBadRequest)

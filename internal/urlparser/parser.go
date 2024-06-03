@@ -2,7 +2,6 @@ package urlparser
 
 import (
 	"github.com/kodaf1/gometrics/internal/errors"
-	"log"
 	"strings"
 )
 
@@ -17,24 +16,18 @@ type UrlMetric struct {
 func Parse(url string) (m *UrlMetric, err error) {
 	urlSlice := strings.Split(strings.Trim(url, "/"), "/")
 
-	log.Println(len(urlSlice))
-
-	if len(urlSlice) != 4 {
+	if len(urlSlice) != 3 {
 		return nil, errors.IncorrectParamsCount
 	}
 
-	if urlSlice[0] != "update" {
-		return nil, errors.UnknownMethod
-	}
-
-	if inStringsArray(urlSlice[1], validMetricTypes) {
+	if !inStringsArray(urlSlice[1], validMetricTypes) {
 		return nil, errors.UnknownType
 	}
 
 	return &UrlMetric{
-		Type:  urlSlice[1],
-		Name:  urlSlice[2],
-		Value: urlSlice[3],
+		Type:  urlSlice[0],
+		Name:  urlSlice[1],
+		Value: urlSlice[2],
 	}, nil
 }
 
