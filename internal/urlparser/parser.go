@@ -16,7 +16,7 @@ type UrlMetric struct {
 func Parse(url string) (m *UrlMetric, err error) {
 	urlSlice := strings.Split(strings.Trim(url, "/"), "/")
 
-	if len(urlSlice) != 3 {
+	if len(urlSlice) != 4 {
 		return nil, errors.IncorrectParamsCount
 	}
 
@@ -25,9 +25,9 @@ func Parse(url string) (m *UrlMetric, err error) {
 	}
 
 	return &UrlMetric{
-		Type:  urlSlice[0],
-		Name:  urlSlice[1],
-		Value: urlSlice[2],
+		Type:  urlSlice[1],
+		Name:  urlSlice[2],
+		Value: urlSlice[3],
 	}, nil
 }
 
