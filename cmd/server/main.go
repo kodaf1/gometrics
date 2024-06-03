@@ -1,52 +1,13 @@
 package main
 
 import (
-	"errors"
+	"github.com/kodaf1/gometrics/internal/server"
 	"github.com/kodaf1/gometrics/internal/storage"
-	"github.com/kodaf1/gometrics/internal/urlparser"
-	"net/http"
-)
-
-// TODO: escape renaming
-import (
-	myErrors "github.com/kodaf1/gometrics/internal/errors"
 )
 
 func main() {
-	if err := run(); err != nil {
+	srv := server.NewServer(storage.NewMapStorage())
+	if err := srv.Run(); err != nil {
 		panic(err)
 	}
-}
-
-func run() error {
-	http.Handle("/update/", http.HandlerFunc(webhook))
-	return http.ListenAndServe(`localhost:8080`, nil)
-}
-
-func webhook(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	metric, err := urlparser.Parse(r.URL.Path)
-
-	switch {
-	case errors.Is(err, myErrors.IncorrectParamsCount):
-		w.WriteHeader(http.StatusNotFound)
-		return
-	case errors.Is(err, nil):
-		break
-	default:
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	err = storage.SaveData(metric)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
