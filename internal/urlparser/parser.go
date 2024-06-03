@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-var validMetricTypes = []string{"gauge", "counter"}
-
 type UrlMetric struct {
 	Type  string
 	Name  string
@@ -18,10 +16,6 @@ func Parse(url string) (m *UrlMetric, err error) {
 
 	if len(urlSlice) != 4 {
 		return nil, errors.IncorrectParamsCount
-	}
-
-	if !inStringsArray(urlSlice[1], validMetricTypes) {
-		return nil, errors.UnknownType
 	}
 
 	return &UrlMetric{

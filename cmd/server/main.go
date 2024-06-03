@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/kodaf1/gometrics/internal/storage"
 	"github.com/kodaf1/gometrics/internal/urlparser"
 	"net/http"
 )
@@ -28,19 +29,22 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := urlparser.Parse(r.URL.Path)
+	metric, err := urlparser.Parse(r.URL.Path)
 
 	switch {
 	case errors.Is(err, myErrors.IncorrectParamsCount):
 		w.WriteHeader(http.StatusNotFound)
 		return
-	case errors.Is(err, myErrors.UnknownType):
-		w.WriteHeader(http.StatusBadRequest)
-		return
 	case errors.Is(err, nil):
 		break
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = storage.SaveData(metric)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
